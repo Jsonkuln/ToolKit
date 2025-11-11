@@ -1,0 +1,27 @@
+#!name=龙湖签到
+#!desc=定时任务及Token获取
+#!author= yujc
+#!homepage= https://github.com/Jsonkuln/ToolKit/tree/master
+#!icon=https://raw.githubusercontent.com/Jsonkuln/ToolKi/main/database/icon_Avatar.png
+#!tag = 定时任务
+
+# ================ 占位 Boxjs订阅 ================
+# 订阅地址：
+# 更新时间：
+
+[Argument]
+CaptureToken = switch,false,tag=[开关] 获取Token,desc=是否启用此处修改
+RunTime = input,"30 10 * * *",tag=自定义执行时间,desc=可手动更改脚本运行时间，默认早上10点半
+APPCookie = switch,true,tag=[开关] APPCookie,desc=是否启用此处修改
+
+[Script]
+# 龙湖签到
+
+cron {RunTime} script-path=https://raw.githubusercontent.com/Jsonkuln/ToolKi/main/Loon/Longfor/LongforSignin.js, tag=日常签到以及抽奖, timeout=15
+
+http-response ^https?:\/\/ly-sta\.longhu\.net\/\/udid\/c1/? script-path=https://raw.githubusercontent.com/Jsonkuln/ToolKi/main/Loon/Longfor/LongforSignin.js, tag=设备Token, timeout=30, enable={CaptureToken}
+
+http-request ^https?:\/\/gw2c-hw-open\.longfor\.com/supera/member/api/bff/pages/v\d+_\d+_\d+/v1/user-info script-path=https://raw.githubusercontent.com/Jsonkuln/ToolKi/main/Loon/L/LongforSignin.js, tag=用户Token, enable={CaptureToken}
+
+[MITM]
+hostname = gw2c-hw-open.longfor.com, ly-sta.longhu.net
