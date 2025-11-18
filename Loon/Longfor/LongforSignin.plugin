@@ -9,7 +9,8 @@
 # 更新时间：
 
 [Argument]
-CaptureToken = switch,false,tag=[开关] 获取Token,desc=是否启用此处修改
+CaptureToken_Account = switch,false,tag=[开关] 获取账号Token,desc=是否启用此处修改
+CaptureToken_Device= switch,false,tag=[开关] 获取设备Token,desc=是否启用此处修改
 RunTime = input,"30 10 * * *",tag=自定义执行时间,desc=可手动更改脚本运行时间，默认早上10点半
 
 [Script]
@@ -17,9 +18,9 @@ RunTime = input,"30 10 * * *",tag=自定义执行时间,desc=可手动更改脚�
 
 cron {RunTime} script-path=https://raw.githubusercontent.com/Jsonkuln/ToolKit/main/Loon/Longfor/LongforSignin.js, tag=日常签到以及抽奖, timeout=15
 
-http-response ^https?:\/\/ly-sta\.longhu\.net\/\/udid\/c1/? script-path=https://raw.githubusercontent.com/Jsonkuln/ToolKit/main/Loon/Longfor/LongforSignin.js, tag=设备Token, timeout=30, enable={CaptureToken}
+http-response ^https?:\/\/ly-sta\.longhu\.net\/\/udid\/c1/? script-path=https://raw.githubusercontent.com/Jsonkuln/ToolKit/main/Loon/Longfor/LongforSignin.js, tag=设备Token, timeout=30, enable={CaptureToken_Device}
 
-http-request ^https?:\/\/gw2c-hw-open\.longfor\.com/supera/member/api/bff/pages/v\d+_\d+_\d+/v1/user-info script-path=https://raw.githubusercontent.com/Jsonkuln/ToolKit/main/Loon/Longfor/LongforSignin.js, tag=用户Token, enable={CaptureToken}
+http-request ^https?:\/\/gw2c-hw-open\.longfor\.com/supera/member/api/bff/pages/v\d+_\d+_\d+/v1/user-info script-path=https://raw.githubusercontent.com/Jsonkuln/ToolKit/main/Loon/Longfor/LongforSignin.js, tag=用户Token, enable={CaptureToken_Account}
 
 [MITM]
 hostname = gw2c-hw-open.longfor.com, ly-sta.longhu.net

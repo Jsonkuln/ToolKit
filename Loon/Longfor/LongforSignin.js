@@ -174,8 +174,12 @@ function isRequest() {
     return typeof $request !== "undefined"
 }
 
-function isMatch(reg) {
-    return !!($request && $request.method !== 'OPTIONS' && $request.url.match(reg))
+function isResponse() {
+    return typeof $response !== "undefined"
+}
+
+function isMatch(obj, reg) {
+    return !!(obj && obj?.method !== 'OPTIONS' && obj?.url.match(reg))
 }
 
 function done(value = {}) {
@@ -248,7 +252,6 @@ async function doLotteryCheckIn() {
     } catch (error) {
         notify("抽奖签到失败", `签到请求失败: ${error.message}`)
         logError("抽奖签到失败", error)
-        done()
     }
 }
 
@@ -289,7 +292,7 @@ async function performLottery(headers) {
 }
 
 function getToken() {
-    if (isMatch(/\/supera\/member\/api\/bff\/pages\/v\d+_\d+_\d+\/v1\/user-info/)) {
+    if (isMatch($request, /\/supera\/member\/api\/bff\/pages\/v\d+_\d+_\d+\/v1\/user-info/)) {
         log('开始获取token')
         
         try {
@@ -319,7 +322,7 @@ function getToken() {
             logError("获取token失败", error)
         }
     }
-    if (isMatch(/\/udid\/c1\/\?/)) {
+    if (isMatch($response, /\/udid\/c1\/\?/)) {
         log('开始获取cookie+risktoken')
         
         try {
@@ -396,6 +399,10 @@ if (isRequest()) {
     // 请求阶段：获取token
     getToken()
     done()
+} else if (isResponse()) {
+    // 获取riskToken
+    getToken();
+    done();  
 } else {
     // 定时任务阶段：执行签到和抽奖
     (async () => {
@@ -428,17 +435,14 @@ if (isRequest()) {
 
             const signInAppRes = await doSignIn(CONFIG.ACTIVITY.SIGN_IN_MINI_APP_NO)
 
-            if (signInAppRes) {
-                log("小程序签到完成")
-                await sleep(1000)
-            } else {
-                log("小程序签到失败")
-                await sleep(1000)
-            }
+            log(`小程序签到：${signInAppRes?"成功":"失败"}`)
             
         } catch (error) {
             notify("执行失败", `脚本执行出错: ${error.message}`)
             logError("脚本执行失败", error)
+            done()
+        }
+        finally {
             done()
         }
     })()
